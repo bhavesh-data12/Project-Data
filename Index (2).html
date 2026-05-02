@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Analyst & Frontend Developer — Bhavesh vyas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+            'fade-in-left': 'fadeInLeft 0.6s ease-out forwards',
+            'fade-in-right': 'fadeInRight 0.6s ease-out forwards',
+            'scale-in': 'scaleIn 0.5s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            fadeInLeft: {
+              '0%': { opacity: '0', transform: 'translateX(-30px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            fadeInRight: {
+              '0%': { opacity: '0', transform: 'translateX(30px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            scaleIn: {
+              '0%': { opacity: '0', transform: 'scale(0.9)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    ::selection { background: rgba(59,130,246,0.3); color: #f4f4f5; }
+    .opacity-0-init { opacity: 0; }
+    .skill-bar-fill { transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-6px); }
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+    .hero-glow-2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -100px; left: -100px;
+      pointer-events: none;
+    }
+    .nav-blur { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .toast {
+      position: fixed; bottom: 30px; right: 30px;
+      padding: 16px 24px; border-radius: 12px;
+      background: #09090b; border: 1px solid rgba(255,255,255,0.1);
+      color: #f4f4f5; font-size: 14px; z-index: 1000;
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .project-img { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    .project-card:hover .project-img { transform: scale(1.05); }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    .mobile-menu {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mobile-menu.open { max-height: 400px; }
+    @media (max-width: 768px) {
+      .hero-glow { width: 300px; height: 300px; top: -50px; right: -80px; }
+      .hero-glow-2 { width: 250px; height: 250px; }
+    }
+  </style>
+</head>
+<body class="bg-[#09090b] text-white antialiased overflow-x-hidden">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <div class="flex items-center gap-3">
+      <span class="iconify text-brand-500 text-lg" data-icon="lucide:check-circle"></span>
+      <span id="toast-msg">Message sent successfully!</span>
+    </div>
+  </div>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#09090b]/80 border-b border-white/[0.05]">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#hero" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-300">B</div>
+        <span class="text-white font-medium text-sm tracking-tight">Bhavesh</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#about" class="text-zinc-400 hover:text-white text-sm transition-colors duration-200">About</a>
+        <a href="#skills" class="text-zinc-400 hover:text-white text-sm transition-colors duration-200">Skills</a>
+        <a href="#projects" class="text-zinc-400 hover:text-white text-sm transition-colors duration-200">Projects</a>
+        <a href="#services" class="text-zinc-400 hover:text-white text-sm transition-colors duration-200">Services</a>
+        <a href="#contact" class="bg-white text-[#09090b] text-xs font-medium h-10 px-6 rounded-full flex items-center hover:bg-zinc-200 transition-colors duration-150">Contact Me</a>
+      </div>
+
+      <!-- Mobile Toggle -->
+      <button id="menu-toggle" class="md:hidden text-zinc-400 hover:text-white transition-colors" aria-label="Toggle menu">
+        <span class="iconify text-2xl" data-icon="lucide:menu" id="menu-icon"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu md:hidden bg-[#09090b]/95 nav-blur border-t border-white/[0.05]">
+      <div class="px-6 py-4 flex flex-col gap-4">
+        <a href="#about" class="text-zinc-400 hover:text-white text-sm py-2 transition-colors mobile-link">About</a>
+        <a href="#skills" class="text-zinc-400 hover:text-white text-sm py-2 transition-colors mobile-link">Skills</a>
+        <a href="#projects" class="text-zinc-400 hover:text-white text-sm py-2 transition-colors mobile-link">Projects</a>
+        <a href="#services" class="text-zinc-400 hover:text-white text-sm py-2 transition-colors mobile-link">Services</a>
+        <a href="#contact" class="bg-white text-[#09090b] text-xs font-medium h-10 px-6 rounded-full flex items-center justify-center hover:bg-zinc-200 transition-colors mobile-link">Contact Me</a>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <section id="hero" class="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    
+    <!-- Background image overlay -->
+    <div class="absolute inset-0">
+      <img src="https://picsum.photos/seed/data-hero-bg/1920/1080.jpg" alt="" class="w-full h-full object-cover opacity-[0.07] grayscale mix-blend-overlay" />
+      <div class="absolute inset-0 bg-gradient-to-b from-[#09090b] via-transparent to-[#09090b]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 w-full">
+      <div class="max-w-3xl">
+        <!-- Status badge -->
+        <div class="opacity-0-init animate-fade-in-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.1] bg-white/[0.03] mb-8">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </span>
+          <span class="text-xs font-medium text-brand-500">Available for freelance work</span>
+        </div>
+
+        <!-- Main heading -->
+        <h1 class="opacity-0-init animate-fade-in-up text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.1] mb-6" style="animation-delay: 0.1s">
+          Hi, I'm a<br />
+          <span class="gradient-text">Data Analyst</span> &<br />
+          Frontend Developer
+        </h1>
+
+        <!-- Description -->
+        <p class="opacity-0-init animate-fade-in-up text-lg md:text-xl text-zinc-400 leading-relaxed mb-10 max-w-xl" style="animation-delay: 0.2s">
+          I help businesses turn data into insights and build clean, user-friendly web interfaces.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="opacity-0-init animate-fade-in-up flex flex-wrap gap-4" style="animation-delay: 0.3s">
+          <a href="#projects" class="bg-white text-[#09090b] text-sm font-medium h-12 px-8 rounded-full flex items-center gap-2 hover:bg-zinc-200 transition-colors duration-150">
+            View My Work
+            <span class="iconify text-base" data-icon="lucide:arrow-right"></span>
+          </a>
+          <a href="#contact" class="border border-white/[0.1] text-white text-sm font-medium h-12 px-8 rounded-full flex items-center gap-2 hover:border-white/[0.2] hover:bg-white/[0.03] transition-all duration-200">
+            Get In Touch
+          </a>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="opacity-0-init animate-fade-in-up flex gap-10 mt-16 pt-8 border-t border-white/[0.05]" style="animation-delay: 0.4s">
+          <div>
+            <div class="text-2xl font-semibold text-white">3+</div>
+            <div class="text-xs text-zinc-500 mt-1">Projects Done</div>
+          </div>
+          <div>
+            <div class="text-2xl font-semibold text-white">10+</div>
+            <div class="text-xs text-zinc-500 mt-1">Skills Mastered</div>
+          </div>
+          <div>
+            <div class="text-2xl font-semibold text-white">5+</div>
+            <div class="text-xs text-zinc-500 mt-1">Tools Used</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0-init animate-fade-in-up" style="animation-delay: 0.6s">
+      <div class="flex flex-col items-center gap-2 text-zinc-600">
+        <span class="text-[10px] uppercase tracking-widest">Scroll</span>
+        <div class="w-px h-8 bg-gradient-to-b from-zinc-600 to-transparent"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== ABOUT SECTION ==================== -->
+  <section id="about" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <!-- Section label -->
+      <div class="opacity-0-init flex items-center gap-3 mb-4">
+        <div class="w-8 h-px bg-brand-500"></div>
+        <span class="text-xs font-medium uppercase tracking-widest text-brand-500">About Me</span>
+      </div>
+      <h2 class="opacity-0-init text-3xl md:text-4xl font-medium tracking-tight mb-16">
+        Turning raw data & code<br />into <span class="gradient-text">real solutions</span>
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+        <!-- Image side -->
+        <div class="opacity-0-init relative">
+          <div class="relative rounded-2xl overflow-hidden border border-white/[0.05]">
+            <img src="https://picsum.photos/seed/analyst-workspace/600/700.jpg" alt="Workspace" class="w-full h-[400px] md:h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#09090b] via-transparent to-transparent"></div>
+          </div>
+          <!-- Floating card -->
+          <div class="absolute -bottom-6 -right-4 md:right-6 bg-zinc-900/90 border border-white/[0.1] rounded-xl p-4 nav-blur animate-float">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+                <span class="iconify text-brand-500" data-icon="lucide:code-2"></span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-white">Dual Expertise</div>
+                <div class="text-xs text-zinc-500">Data + Frontend</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text side -->
+        <div class="space-y-6">
+          <div class="opacity-0-init">
+            <div class="flex items-start gap-4 p-5 rounded-xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300">
+              <div class="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:monitor"></span>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-white mb-2">Frontend Development</h3>
+                <p class="text-sm text-zinc-400 leading-relaxed">Hands-on experience in frontend development using HTML, CSS, JavaScript, and React.js to build responsive and modern web applications.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="opacity-0-init">
+            <div class="flex items-start gap-4 p-5 rounded-xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300">
+              <div class="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:bar-chart-3"></span>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-white mb-2">Data Analysis</h3>
+                <p class="text-sm text-zinc-400 leading-relaxed">Working with Python, SQL (MySQL), Pandas, NumPy, Excel, and Power BI to clean, analyze, and visualize data — focusing on solving real-world problems.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="opacity-0-init">
+            <div class="flex items-start gap-4 p-5 rounded-xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300">
+              <div class="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:lightbulb"></span>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-white mb-2">Problem Solver</h3>
+                <p class="text-sm text-zinc-400 leading-relaxed">From data cleaning and dashboard creation to extracting business insights — I love turning messy data into clear, actionable stories.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== SKILLS SECTION ==================== -->
+  <section id="skills" class="py-24 relative">
+    <!-- Subtle bg -->
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-900/[0.03] to-transparent pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <div class="opacity-0-init flex items-center justify-center gap-3 mb-4">
+          <div class="w-8 h-px bg-brand-500"></div>
+          <span class="text-xs font-medium uppercase tracking-widest text-brand-500">My Skills</span>
+          <div class="w-8 h-px bg-brand-500"></div>
+        </div>
+        <h2 class="opacity-0-init text-3xl md:text-4xl font-medium tracking-tight">
+          Tools & technologies<br />I <span class="gradient-text">work with</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Frontend Skills -->
+        <div class="opacity-0-init card-hover p-8 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+              <span class="iconify text-brand-500 text-xl" data-icon="lucide:code-2"></span>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-white">Frontend Development</h3>
+              <p class="text-xs text-zinc-500">Building modern web interfaces</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <!-- HTML -->
+            <div class="skill-item">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="iconify text-orange-400 text-lg" data-icon="lucide:file-code"></span>
+                  <span class="text-sm text-zinc-300">HTML</span>
+                </div>
+                <span class="text-xs text-zinc-500 font-medium">90%</span>
+              </div>
+              <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="skill-bar-fill h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full" data-width="90" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- CSS -->
+            <div class="skill-item">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="iconify text-blue-400 text-lg" data-icon="lucide:palette"></span>
+                  <span class="text-sm text-zinc-300">CSS</span>
+                </div>
+                <span class="text-xs text-zinc-500 font-medium">85%</span>
+              </div>
+              <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="skill-bar-fill h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full" data-width="85" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- JavaScript -->
+            <div class="skill-item">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="iconify text-yellow-400 text-lg" data-icon="lucide:terminal"></span>
+                  <span class="text-sm text-zinc-300">JavaScript</span>
+                </div>
+                <span class="text-xs text-zinc-500 font-medium">80%</span>
+              </div>
+              <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="skill-bar-fill h-full bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full" data-width="80" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- React -->
+            <div class="skill-item">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="iconify text-cyan-400 text-lg" data-icon="lucide:atom"></span>
+                  <span class="text-sm text-zinc-300">React.js</span>
+                </div>
+                <span class="text-xs text-zinc-500 font-medium">75%</span>
+              </div>
+              <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="skill-bar-fill h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full" data-width="75" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Analysis Skills -->
+        <div class="opacity-0-init card-hover p-8 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+              <span class="iconify text-brand-500 text-xl" data-icon="lucide:bar-chart-3"></span>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-white">Data Analysis</h3>
+              <p class="text-xs text-zinc-500">Cleaning, analyzing & visualizing</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5">
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-green-400" data-icon="lucide:terminal"></span> Python
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-blue-400" data-icon="lucide:table"></span> Pandas
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-purple-400" data-icon="lucide:grid-3x3"></span> NumPy
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-orange-400" data-icon="lucide:database"></span> SQL (MySQL)
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-green-500" data-icon="lucide:sheet"></span> Excel
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-yellow-400" data-icon="lucide:layout-dashboard"></span> Power BI
+            </span>
+            <span class="px-4 py-2 rounded-full bg-zinc-800/60 border border-white/[0.05] text-sm text-zinc-300 hover:border-brand-500/30 hover:text-white transition-all duration-200 cursor-default flex items-center gap-2">
+              <span class="iconify text-pink-400" data-icon="lucide:brain"></span> Scikit-learn
+            </span>
+          </div>
+
+          <!-- Mini highlight -->
+          <div class="mt-8 p-4 rounded-xl bg-brand-500/[0.05] border border-brand-500/10">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="iconify text-brand-400 text-sm" data-icon="lucide:sparkles"></span>
+              <span class="text-xs font-medium text-brand-400">Currently Learning</span>
+            </div>
+            <p class="text-xs text-zinc-500">Advanced Machine Learning & Deep Learning with Python</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== PROJECTS SECTION ==================== -->
+  <section id="projects" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <div class="opacity-0-init flex items-center justify-center gap-3 mb-4">
+          <div class="w-8 h-px bg-brand-500"></div>
+          <span class="text-xs font-medium uppercase tracking-widest text-brand-500">My Projects</span>
+          <div class="w-8 h-px bg-brand-500"></div>
+        </div>
+        <h2 class="opacity-0-init text-3xl md:text-4xl font-medium tracking-tight">
+          Real projects, <span class="gradient-text">real results</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Project 1: Sales Data Analysis -->
+        <div class="opacity-0-init project-card card-hover group rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] overflow-hidden transition-all duration-300">
+          <div class="relative h-52 overflow-hidden">
+            <img src="https://picsum.photos/seed/sales-dashboard-chart/600/400.jpg" alt="Sales Dashboard" class="project-img w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[10px] font-medium text-green-400 uppercase tracking-wider">Data Analysis</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-medium text-white mb-3">Sales Data Analysis</h3>
+            <ul class="space-y-2 mb-5">
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Cleaned raw data using Python & Pandas
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Found top-performing products
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Created dashboard in Power BI
+              </li>
+            </ul>
+            <div class="flex gap-2 pt-4 border-t border-white/[0.05]">
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Python</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Pandas</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Power BI</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2: Student Performance -->
+        <div class="opacity-0-init project-card card-hover group rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] overflow-hidden transition-all duration-300">
+          <div class="relative h-52 overflow-hidden">
+            <img src="https://picsum.photos/seed/student-grades-data/600/400.jpg" alt="Student Analysis" class="project-img w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] font-medium text-purple-400 uppercase tracking-wider">Analytics</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-medium text-white mb-3">Student Performance Analysis</h3>
+            <ul class="space-y-2 mb-5">
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Analyzed student marks data
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Used Excel + Pandas for analysis
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Generated insights for improvement
+              </li>
+            </ul>
+            <div class="flex gap-2 pt-4 border-t border-white/[0.05]">
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Excel</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Pandas</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">Python</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3: Portfolio Website -->
+        <div class="opacity-0-init project-card card-hover group rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-white/[0.1] overflow-hidden transition-all duration-300">
+          <div class="relative h-52 overflow-hidden">
+            <img src="https://picsum.photos/seed/react-portfolio-ui/600/400.jpg" alt="Portfolio Website" class="project-img w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/50 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-medium text-cyan-400 uppercase tracking-wider">Frontend</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-medium text-white mb-3">Portfolio Website</h3>
+            <ul class="space-y-2 mb-5">
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Built using React.js
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Responsive and fast UI
+              </li>
+              <li class="flex items-start gap-2 text-sm text-zinc-400">
+                <span class="iconify text-brand-500 text-sm mt-0.5 flex-shrink-0" data-icon="lucide:check"></span>
+                Clean, modern design
+              </li>
+            </ul>
+            <div class="flex gap-2 pt-4 border-t border-white/[0.05]">
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">React.js</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">CSS</span>
+              <span class="px-2.5 py-1 rounded-md bg-zinc-800/60 text-[11px] text-zinc-400">JavaScript</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== SERVICES SECTION ==================== -->
+  <section id="services" class="py-24 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-900/[0.03] to-transparent pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <div class="opacity-0-init flex items-center justify-center gap-3 mb-4">
+          <div class="w-8 h-px bg-brand-500"></div>
+          <span class="text-xs font-medium uppercase tracking-widest text-brand-500">Services</span>
+          <div class="w-8 h-px bg-brand-500"></div>
+        </div>
+        <h2 class="opacity-0-init text-3xl md:text-4xl font-medium tracking-tight mb-4">
+          How I can <span class="gradient-text">help you</span>
+        </h2>
+        <p class="opacity-0-init text-zinc-400 text-base max-w-lg mx-auto">
+          Focused services designed to solve real business problems with data and code.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Service 1 -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-brand-500/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <span class="iconify text-brand-500 text-xl" data-icon="lucide:scan-search"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">Data Cleaning & Analysis</h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">Turn messy, raw data into clean datasets ready for analysis. Handle missing values, duplicates, and inconsistencies.</p>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-brand-500/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <span class="iconify text-brand-500 text-xl" data-icon="lucide:layout-dashboard"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">Dashboard Creation</h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">Interactive, professional dashboards in Power BI or Excel that visualize your KPIs and business metrics clearly.</p>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-brand-500/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <span class="iconify text-brand-500 text-xl" data-icon="lucide:database"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">SQL Data Queries</h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">Write optimized SQL queries to extract, filter, join, and aggregate data from MySQL databases efficiently.</p>
+        </div>
+
+        <!-- Service 4 -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-brand-500/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <span class="iconify text-brand-500 text-xl" data-icon="lucide:globe"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">Frontend Website Development</h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">Build responsive, fast, and modern websites using React.js, HTML, CSS, and JavaScript from scratch.</p>
+        </div>
+
+        <!-- Service 5 -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-zinc-900/40 border border-white/[0.05] hover:border-brand-500/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <span class="iconify text-brand-500 text-xl" data-icon="lucide:brain"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">Basic ML Models</h3>
+          <p class="text-sm text-zinc-400 leading-relaxed">Build simple machine learning models using Scikit-learn for classification, regression, and prediction tasks.</p>
+        </div>
+
+        <!-- CTA Card -->
+        <div class="opacity-0-init card-hover p-7 rounded-2xl bg-gradient-to-br from-brand-600/20 to-brand-900/20 border border-brand-500/20 hover:border-brand-500/40 transition-all duration-300 flex flex-col justify-center items-center text-center">
+          <div class="w-12 h-12 rounded-full bg-brand-500/20 flex items-center justify-center mb-4">
+            <span class="iconify text-brand-400 text-xl" data-icon="lucide:message-circle"></span>
+          </div>
+          <h3 class="text-base font-medium text-white mb-2">Need something custom?</h3>
+          <p class="text-sm text-zinc-400 mb-5">Let's discuss your specific requirements.</p>
+          <a href="#contact" class="bg-white text-[#09090b] text-xs font-medium h-10 px-6 rounded-full flex items-center gap-2 hover:bg-zinc-200 transition-colors duration-150">
+            Let's Talk
+            <span class="iconify text-sm" data-icon="lucide:arrow-right"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== CONTACT SECTION ==================== -->
+  <section id="contact" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-16">
+        <!-- Left side info -->
+        <div>
+          <div class="opacity-0-init flex items-center gap-3 mb-4">
+            <div class="w-8 h-px bg-brand-500"></div>
+            <span class="text-xs font-medium uppercase tracking-widest text-brand-500">Contact</span>
+          </div>
+          <h2 class="opacity-0-init text-3xl md:text-4xl font-medium tracking-tight mb-6">
+            Let's work<br /><span class="gradient-text">together</span>
+          </h2>
+          <p class="opacity-0-init text-zinc-400 leading-relaxed mb-10">
+            If you are looking for someone to analyze your data, build dashboards, or create a website, feel free to contact me. I'd love to hear about your project.
+          </p>
+
+          <!-- Contact details -->
+          <div class="space-y-5">
+            <div class="opacity-0-init flex items-center gap-4">
+              <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center flex-shrink-0">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:mail"></span>
+              </div>
+              <div>
+                <div class="text-xs text-zinc-500 mb-0.5">Email</div>
+                <a href="mailto:your@email.com" class="text-sm text-zinc-300 hover:text-white transition-colors">bhaveshvyasji2@gmail.com</a>
+              </div>
+            </div>
+
+            <div class="opacity-0-init flex items-center gap-4">
+              <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center flex-shrink-0">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:linkedin"></span>
+              </div>
+              <div>
+                <div class="text-xs text-zinc-500 mb-0.5">LinkedIn</div>
+                <a href="https://linkedin.com/in/your-profile" target="_blank" class="text-sm text-zinc-300 hover:text-white transition-colors">your-link</a>
+              </div>
+            </div>
+
+            <div class="opacity-0-init flex items-center gap-4">
+              <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-white/[0.05] flex items-center justify-center flex-shrink-0">
+                <span class="iconify text-brand-500 text-lg" data-icon="lucide:message-square"></span>
+              </div>
+              <div>
+                <div class="text-xs text-zinc-500 mb-0.5">WhatsApp</div>
+                <a href="https://wa.me/your-number" target="_blank" class="text-sm text-zinc-300 hover:text-white transition-colors">your-number</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right side form -->
+        <div class="opacity-0-init">
+          <form id="contact-form" class="p-8 rounded-2xl bg-zinc-900/40 border border-white/[0.05] space-y-5">
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-2">Your Name</label>
+              <input type="text" id="form-name" placeholder="John Doe" required class="w-full bg-[#09090b] border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-2">Email Address</label>
+              <input type="email" id="form-email" placeholder="Evenery@example.com" required class="w-full bg-[#09090b] border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-2">Message</label>
+              <textarea id="form-message" rows="5" placeholder="Tell me about your project..." required class="w-full bg-[#09090b] border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-white text-[#09090b] text-sm font-medium h-12 rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors duration-150">
+              <span class="iconify text-base" data-icon="lucide:send"></span>
+              Send Message
+            </button>
+            <p class="text-[11px] text-zinc-600 text-center">I'll get back to you within 24 hours.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-white/[0.05] py-10">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center text-white font-semibold text-xs">V</div>
+          <span class="text-sm text-zinc-400">© 2026. All rights reserved.</span>
+        </div>
+        <div class="flex items-center gap-5">
+          <a href="https://linkedin.com/in/your-profile" target="_blank" class="text-zinc-500 hover:text-white transition-colors duration-200">
+            <span class="iconify text-lg" data-icon="lucide:linkedin"></span>
+          </a>
+          <a href="https://github.com/your-username" target="_blank" class="text-zinc-500 hover:text-white transition-colors duration-200">
+            <span class="iconify text-lg" data-icon="lucide:github"></span>
+          </a>
+          <a href="https://wa.me/your-number" target="_blank" class="text-zinc-500 hover:text-white transition-colors duration-200">
+            <span class="iconify text-lg" data-icon="lucide:message-square"></span>
+          </a>
+          <a href="bhaveshvyasji2@email.com" class="text-zinc-500 hover:text-white transition-colors duration-200">
+            <span class="iconify text-lg" data-icon="lucide:mail"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ---- Mobile Menu Toggle ----
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    let menuOpen = false;
+
+    menuToggle.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('open', menuOpen);
+      menuIcon.setAttribute('data-icon', menuOpen ? 'lucide:x' : 'lucide:menu');
+    });
+
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menuOpen = false;
+        mobileMenu.classList.remove('open');
+        menuIcon.setAttribute('data-icon', 'lucide:menu');
+      });
+    });
+
+    // ---- Navbar background on scroll ----
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.style.borderBottomColor = 'rgba(255,255,255,0.08)';
+      } else {
+        nav.style.borderBottomColor = 'rgba(255,255,255,0.03)';
+      }
+    });
+
+    // ---- Scroll-triggered animations (Intersection Observer) ----
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = el.dataset.delay || (index % 6) * 80;
+          setTimeout(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            el.classList.remove('opacity-0-init');
+          }, delay);
+          observer.unobserve(el);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.opacity-0-init').forEach((el, i) => {
+      el.dataset.delay = i * 80;
+      observer.observe(el);
+    });
+
+    // ---- Skill bar animation ----
+    const skillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const bars = entry.target.querySelectorAll('.skill-bar-fill');
+          bars.forEach((bar, i) => {
+            setTimeout(() => {
+              bar.style.width = bar.dataset.width + '%';
+            }, i * 150);
+          });
+          skillObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('#skills .card-hover').forEach(card => {
+      skillObserver.observe(card);
+    });
+
+    // ---- Toast notification ----
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toastMsg.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // ---- Contact Form ----
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('form-name').value.trim();
+      const email = document.getElementById('form-email').value.trim();
+      const message = document.getElementById('form-message').value.trim();
+
+      if (!name || !email || !message) {
+        showToast('Please fill in all fields.');
+        return;
+      }
+
+      // Simulate sending
+      const btn = this.querySelector('button[type="submit"]');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="iconify animate-spin text-base" data-icon="lucide:loader-2"></span> Sending...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        showToast(`Thanks ${name}! Your message has been sent.`);
+        this.reset();
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }, 1500);
+    });
+
+    // ---- Active nav link highlight on scroll ----
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (window.scrollY >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('text-white');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('text-white');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
